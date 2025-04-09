@@ -59,7 +59,7 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed');
       }
       
-      router.push('/');
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'An error occurred during registration');
     } finally {
