@@ -25,7 +25,7 @@ interface Project {
   tasks: Task[];
 }
 
-export default function ProjectDetail({ params }: { params: { id: string } }) {
+export default function ProjectDetail({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { id } = use(params);
   const [project, setProject] = useState<Project | null>(null);

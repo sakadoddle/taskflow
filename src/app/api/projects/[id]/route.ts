@@ -6,11 +6,11 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
 
-    const { id } = params; 
+    const { id } = await params; 
     console.log('Project ID:', id);
 
     const token = request.cookies.get('auth-token')?.value;
@@ -64,10 +64,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const token = request.cookies.get('auth-token')?.value;
     if (!token) {
@@ -133,10 +133,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Get the token from the cookies
     const token = request.cookies.get('auth-token')?.value;

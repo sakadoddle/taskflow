@@ -13,7 +13,7 @@ if (!JWT_SECRET_STRING) {
 const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STRING);
 const JWT_ALGORITHM = 'HS256';
 
-export interface JwtPayload {
+export interface JwtPayload extends jose.JWTPayload {
   id: string;
   email: string;
 }
@@ -36,10 +36,10 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 export async function generateToken(user: Pick<UserData, 'id' | 'email'>): Promise<string> {
   const payload: JwtPayload = {
     id: user.id,
-    email: user.email,
+    email: user.email
   };
 
-  return new jose.SignJWT(payload)
+  return await new jose.SignJWT(payload)
     .setProtectedHeader({ alg: JWT_ALGORITHM })
     .setIssuedAt()
     .setExpirationTime('7d') 
