@@ -8,11 +8,21 @@
 - **Responsive UI**: Clean interface built with TailwindCSS
 - **Database Integration**: PostgreSQL with Prisma ORM
 
+## Tech Stack
+
+- **Frontend**: Next.js 15 (App Router)
+- **Backend**: Next.js API Routes
+- **Database**: PostgreSQL + Prisma
+- **Authentication**: JWT
+- **Styling**: TailwindCSS
+- **Deployment**: Vercel
+
 ## Installation
 
+### Prerequisites
 - Node.js v18+
 - PostgreSQL database
-- npm or yarn
+- npm
 
 ### Setup Instructions
 
@@ -23,6 +33,11 @@
 2. Install dependencies:
    ```bash
    npm i
+   ```
+   If npm i doesn't work, try using:
+    ```bash
+    npm install --legacy-peer-deps
+    ```
 3. Set up environment variables
     ```bash
    cp .env.example .env
