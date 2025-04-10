@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
 interface Task {
   id: string;
@@ -27,6 +27,7 @@ interface Project {
 
 export default function ProjectDetail({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const { id } = use(params);
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,17 +43,17 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
     title: '',
     description: '',
   });
-  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  // const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [filterDueDate, setFilterDueDate] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProject();
-  }, [params.id]);
+  }, [id]);
 
   const fetchProject = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/projects/${params.id}`);
+      const response = await fetch(`/api/projects/${id}`);
       if (!response.ok) {
         throw new Error('Failed to fetch project');
       }
@@ -102,7 +103,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
         },
         body: JSON.stringify({
           ...newTask,
-          projectId: params.id,
+          projectId: id,
         }),
       });
       
@@ -129,7 +130,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
     }
     
     try {
-      const response = await fetch(`/api/projects/${params.id}`, {
+      const response = await fetch(`/api/projects/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +156,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
     }
     
     try {
-      const response = await fetch(`/api/projects/${params.id}`, {
+      const response = await fetch(`/api/projects/${id}`, {
         method: 'DELETE',
       });
       
@@ -218,7 +219,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
     }
   };
 
-  const handleDragEnd = async (result: any) => {
+  const handleDragEnd = async (result: DropResult) => {
     if (!result.destination || !project) return;
 
     const { source, destination, draggableId } = result;
@@ -539,12 +540,12 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
 
         <DragDropContext onDragEnd={handleDragEnd}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Droppable droppableId="TODO">
+            <Droppable key={"TODO"} droppableId="TODO" isDropDisabled={false} isCombineEnabled={true} ignoreContainerClipping={true}>
               {(provided) => (
                 <div
-                  className="bg-gray-50 p-4 rounded-md"
                   ref={provided.innerRef}
                   {...provided.droppableProps}
+                  className="bg-gray-50 p-4 rounded-md"
                 >
                   <h3 className="font-medium text-gray-900 mb-2">To Do</h3>
                   <div className="space-y-2">
@@ -552,7 +553,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
                       <p className="text-sm text-gray-500 italic">No tasks</p>
                     ) : (
                       getFilteredTasks('TODO').map((task, index) => (
-                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                        <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                           {(provided) => (
                             <div
                               ref={provided.innerRef}
@@ -564,13 +565,19 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
                                 <h4 className="font-medium text-gray-900">{task.title}</h4>
                                 <div className="flex space-x-1">
                                   <button
-                                    onClick={() => handleUpdateTaskStatus(task.id, 'IN_PROGRESS')}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleUpdateTaskStatus(task.id, 'IN_PROGRESS')
+                                    }}
                                     className="text-xs text-indigo-600 hover:text-indigo-900"
                                   >
                                     Move →
                                   </button>
                                   <button
-                                    onClick={() => handleDeleteTask(task.id)}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleDeleteTask(task.id)
+                                    }}
                                     className="text-xs text-red-600 hover:text-red-900"
                                   >
                                     Delete
@@ -596,7 +603,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
               )}
             </Droppable>
             
-            <Droppable droppableId="IN_PROGRESS">
+            <Droppable key={"IN_PROGRESS"} droppableId="IN_PROGRESS" isDropDisabled={false} isCombineEnabled={true} ignoreContainerClipping={true}>
               {(provided) => (
                 <div
                   className="bg-gray-50 p-4 rounded-md"
@@ -609,7 +616,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
                       <p className="text-sm text-gray-500 italic">No tasks</p>
                     ) : (
                       getFilteredTasks('IN_PROGRESS').map((task, index) => (
-                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                        <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                           {(provided) => (
                             <div
                               ref={provided.innerRef}
@@ -621,19 +628,28 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
                                 <h4 className="font-medium text-gray-900">{task.title}</h4>
                                 <div className="flex space-x-1">
                                   <button
-                                    onClick={() => handleUpdateTaskStatus(task.id, 'TODO')}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleUpdateTaskStatus(task.id, 'TODO')
+                                    }}
                                     className="text-xs text-indigo-600 hover:text-indigo-900 cursor-pointer"
                                   >
                                     ← Back
                                   </button>
                                   <button
-                                    onClick={() => handleUpdateTaskStatus(task.id, 'DONE')}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleUpdateTaskStatus(task.id, 'DONE')
+                                    }}
                                     className="text-xs text-indigo-600 hover:text-indigo-900 cursor-pointer"
                                   >
                                     Done →
                                   </button>
                                   <button
-                                    onClick={() => handleDeleteTask(task.id)}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleDeleteTask(task.id)
+                                    }}
                                     className="text-xs text-red-600 hover:text-red-900 cursor-pointer"
                                   >
                                     Delete
@@ -659,7 +675,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
               )}
             </Droppable>
             
-            <Droppable droppableId="DONE">
+            <Droppable key={"DONE"} droppableId="DONE" isDropDisabled={false} isCombineEnabled={true} ignoreContainerClipping={true}>
               {(provided) => (
                 <div
                   className="bg-gray-50 p-4 rounded-md"
@@ -672,7 +688,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
                       <p className="text-sm text-gray-500 italic">No tasks</p>
                     ) : (
                       getFilteredTasks('DONE').map((task, index) => (
-                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                        <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                           {(provided) => (
                             <div
                               ref={provided.innerRef}
@@ -684,13 +700,19 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
                                 <h4 className="font-medium text-gray-900 line-through">{task.title}</h4>
                                 <div className="flex space-x-1">
                                   <button
-                                    onClick={() => handleUpdateTaskStatus(task.id, 'IN_PROGRESS')}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleUpdateTaskStatus(task.id, 'IN_PROGRESS')
+                                    }}
                                     className="text-xs text-indigo-600 hover:text-indigo-900"
                                   >
                                     ← Back
                                   </button>
                                   <button
-                                    onClick={() => handleDeleteTask(task.id)}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleDeleteTask(task.id)
+                                    }}
                                     className="text-xs text-red-600 hover:text-red-900"
                                   >
                                     Delete

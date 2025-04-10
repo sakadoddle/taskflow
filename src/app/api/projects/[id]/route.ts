@@ -10,7 +10,7 @@ export async function GET(
 ) {
   try {
 
-    const { id } = await  params; 
+    const { id } = params; 
     console.log('Project ID:', id);
 
     const token = request.cookies.get('auth-token')?.value;

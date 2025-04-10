@@ -55,8 +55,6 @@ export async function middleware(request: NextRequest) { // Make middleware asyn
      return response;
   }
 
-  // If the token is valid, allow the request to proceed
-  // You could potentially attach user info to the request headers here if needed
   // const requestHeaders = new Headers(request.headers);
   // requestHeaders.set('x-user-id', decodedPayload.id);
   // requestHeaders.set('x-user-email', decodedPayload.email);
