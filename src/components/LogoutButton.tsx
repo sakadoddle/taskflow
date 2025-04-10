@@ -35,7 +35,8 @@ export default function LogoutButton() {
     <button
       onClick={handleLogout}
       disabled={isLoggingOut}
-      className="text-sm font-medium text-white disabled:opacity-50 cursor-pointer"
+      className="text-sm font-medium  disabled:opacity-50 cursor-pointer"
+      style={{ color: 'var(--nav-text)' }}
     >
       {isLoggingOut ? 'Logging out...' : 'Logout'}
     </button>

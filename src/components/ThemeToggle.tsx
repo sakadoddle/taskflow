@@ -8,16 +8,9 @@ export default function ThemeToggle() {
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Only execute client-side
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) {
-    return (
-      <button className="p-2 rounded-md text-gray-500">
-        <SunIcon className="h-5 w-5" />
-      </button>
-    );
-  }
+  if (!mounted) return null;
 
   const isDark = resolvedTheme === 'dark';
 
